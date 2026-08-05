@@ -1,0 +1,10 @@
+# Archivos de origen y automatización local — no necesarios para el sitio publicado
+Awards/*.xlsx
+Awards/*.xls
+_awards_build_state.json
+awards_build.log
+Informe de ventas*.xlsx
+
+# Paquete de terceros (skill de diseño), no forma parte del sitio
+ui-ux-pro-max-skill-main/
+Recursos/ui-ux-pro-max-skill-main/

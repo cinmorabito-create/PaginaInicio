@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Awards · Portal Equipo Comercial VFCh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream:   #EDEAE3;
+    --wine:    #7A1C1C;
+    --wine-dk: #5C1212;
+    --gold:    #B8913A;
+    --char:    #2A1810;
+    --border:  rgba(122,28,28,0.18);
+    --border-light: rgba(122,28,28,0.10);
+  }
+
+  html, body {
+    min-height: 100%;
+    background: var(--cream);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    color: var(--char);
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 90% 80% at 50% 30%, var(--cream) 0%, color-mix(in srgb, var(--cream) 82%, #c8b89a) 100%);
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 64px;
+  }
+
+  /* ── HEADER ── */
+  .topbar {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    color: var(--wine);
+    text-decoration: none;
+    padding: 8px 4px;
+    border-radius: 4px;
+    transition: color .2s;
+  }
+  .back-link:hover { color: var(--gold); }
+  .back-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .back-link svg { width: 14px; height: 14px; }
+
+  .header { text-align: center; margin: 8px 0 20px; }
+  .header img { max-width: 170px; width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 34px;
+    font-weight: 500;
+    letter-spacing: .01em;
+    color: var(--wine-dk);
+    text-align: center;
+  }
+  .page-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(42,24,16,.62);
+    margin-top: 6px;
+    white-space: nowrap;
+  }
+
+  .ornament { display: flex; align-items: center; gap: 12px; width: 220px; margin: 22px auto 40px; }
+  .ornament-line { flex: 1; height: 1px; background: var(--gold); opacity: .45; }
+  .ornament-diamond { width: 5px; height: 5px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+
+  /* ── MAIN ── */
+  .main { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 40px; }
+
+  .section-label { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .section-label-text { font-size: 9px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+  #resultsLabel { white-space: normal; }
+  .section-label-line { flex: 1; height: 1px; background: var(--border); }
+  .section-label-count { font-size: 11px; color: rgba(42,24,16,.5); white-space: nowrap; font-weight: 500; }
+
+  /* ── STEP 1: WINERY (mismo tratamiento que .brand-btn de la página de inicio) ── */
+  .winery-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+  .winery-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,.65);
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: border-color .25s, box-shadow .25s, transform .25s;
+    padding: 12px;
+    overflow: hidden;
+  }
+  .winery-btn:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 8px 28px rgba(42,24,16,0.10); }
+  .winery-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .winery-btn[aria-pressed="true"] { border-color: var(--wine); box-shadow: 0 0 0 2px var(--wine) inset; }
+  .winery-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+  /* ── STEP 2: SUBMARCA ── */
+  .step { animation: fadeUp .35s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .hidden { display: none !important; }
+
+  .category-group { margin-bottom: 20px; }
+  .category-group:last-child { margin-bottom: 0; }
+  .category-heading {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 16px; font-style: italic; font-weight: 500;
+    color: var(--wine-dk); margin-bottom: 10px; letter-spacing: .01em;
+  }
+  .submarca-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .submarca-chip {
+    padding: 10px 18px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: .02em;
+    color: var(--char);
+    background: rgba(255,255,255,.55);
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all .2s;
+    min-height: 44px;
+  }
+  .submarca-chip:hover { border-color: var(--gold); }
+  .submarca-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .submarca-chip[aria-pressed="true"] { background: var(--wine); border-color: var(--wine); color: var(--cream); }
+  .submarca-chip .chip-count { opacity: .65; font-size: 11px; margin-left: 5px; }
+
+  /* ── STEP 3: RESULTS ── */
+  .results-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .results-search {
+    flex: 1; min-width: 200px;
+    display: flex; border: 1px solid var(--border); background: rgba(255,255,255,.55);
+  }
+  .results-search input {
+    flex: 1; border: none; outline: none; padding: 11px 14px;
+    font-family: 'Montserrat', sans-serif; font-size: 13px; background: transparent; color: var(--char);
+  }
+  .results-search input::placeholder { color: rgba(42,24,16,.35); }
+  .results-count { font-size: 11.5px; color: rgba(42,24,16,.55); white-space: nowrap; font-weight: 500; }
+
+  .table-wrap {
+    width: 100%; overflow-x: auto; border: 1px solid var(--border-light);
+    background: rgba(255,255,255,.5);
+    -webkit-overflow-scrolling: touch;
+  }
+  table.awards-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+  table.awards-table thead th {
+    text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--gold); padding: 12px 16px; border-bottom: 1px solid var(--border);
+    background: rgba(122,28,28,0.04); position: sticky; top: 0;
+  }
+  table.awards-table tbody td {
+    padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border-light); vertical-align: top;
+  }
+  table.awards-table tbody tr:last-child td { border-bottom: none; }
+  table.awards-table tbody tr:hover { background: rgba(122,28,28,0.035); }
+  .col-puntaje { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--wine-dk); white-space: nowrap; }
+  .col-premio { color: var(--gold); font-weight: 500; }
+  .col-cosecha { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .empty-state {
+    text-align: center; padding: 40px 20px; color: rgba(42,24,16,.5); font-size: 13px;
+  }
+
+  .footer { margin-top: 56px; font-size: 11px; color: rgba(42,24,16,.4); text-align: center; }
+
+  @media (max-width: 640px) {
+    .page-title { font-size: 27px; }
+    .page-subtitle { white-space: normal; max-width: 320px; margin-left: auto; margin-right: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .step { animation: none; }
+    .winery-btn, .submarca-chip { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <a class="back-link" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Volver al portal
+    </a>
+  </div>
+
+  <div class="header">
+__LOGO_IMG__
+  </div>
+
+  <h1 class="page-title">Awards</h1>
+  <p class="page-subtitle">Consulta los premios y puntajes obtenidos por cada viña, filtrando por marca y submarca.</p>
+
+  <div class="ornament">
+    <span class="ornament-line"></span><span class="ornament-diamond"></span><span class="ornament-line"></span>
+  </div>
+
+  <div class="main">
+
+    <!-- STEP 1: WINERY -->
+    <div>
+      <div class="section-label">
+        <span class="section-label-text">1 · Selecciona la viña</span>
+        <span class="section-label-line"></span>
+      </div>
+      <div class="winery-grid" id="wineryGrid" role="group" aria-label="Selección de viña"></div>
+    </div>
+
+    <!-- STEP 2: SUBMARCA -->
+    <div class="step hidden" id="submarcaStep">
+      <div class="section-label">
+        <span class="section-label-text">2 · Selecciona la submarca</span>
+        <span class="section-label-line"></span>
+      </div>
+      <div id="submarcaGrid" role="group" aria-label="Selección de submarca"></div>
+    </div>
+
+    <!-- STEP 3: RESULTS -->
+    <div class="step hidden" id="resultsStep">
+      <div class="section-label">
+        <span class="section-label-text" id="resultsLabel">3 · Resultados</span>
+        <span class="section-label-line"></span>
+      </div>
+      <div class="results-toolbar">
+        <div class="results-search">
+          <input type="text" id="searchInput" placeholder="Buscar por concurso, cepa (ej: sauvignon blanc), cosecha o premio..." oninput="renderTable()" />
+        </div>
+        <span class="results-count" id="resultsCount" aria-live="polite"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="awards-table">
+          <thead>
+            <tr id="resultsHeadRow"></tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state hidden" id="emptyState">No se encontraron resultados con ese filtro.</div>
+    </div>
+
+  </div>
+
+  <p class="footer">&copy; 2026 Viñedos Familia Chadwick SpA &mdash; Portal Equipo Comercial</p>
+
+</div>
+
+<script>
+const AWARDS_DATA = __AWARDS_DATA__;
+
+const WINERIES = [
+  { key: 'Arboleda',          logo: 'Recursos/LogoArb.png' },
+  { key: 'Caliterra',         logo: 'Recursos/LogoCa.png'  },
+  { key: 'Errázuriz',         logo: 'Recursos/LogoEz.png'  },
+  { key: 'Seña',              logo: 'Recursos/LogoSn.png'  },
+  { key: 'Viñedo Chadwick',   logo: 'Recursos/LogoVCH.png' },
+];
+
+let currentWinery = null;
+let currentSubmarcaKey = null; // normalized (trim+lowercase)
+let currentSubmarcaLabel = null;
+let currentCategoriaKey = null; // null = category grouping not used for this winery (e.g. Seña/VCH)
+
+// Orden fijo pedido: Iconos, Ultra Premium, Super Premium, Premium — el resto cae en "Otros"
+const CATEGORY_ORDER = ['Iconos', 'Ultra Premium', 'Super Premium', 'Premium', 'Otros'];
+
+function normSub(s) { return (s||'').trim().toLowerCase(); }
+
+// Agrupa variantes que deben mostrarse bajo un único botón (ej: "Villa" y "Villa Don Maximiano" → "VILLA"),
+// sin alterar el valor real que se muestra en la tabla de resultados.
+const SUB_GROUP_OVERRIDES = {
+  'villa': 'villa', 'villa don maximiano': 'villa',
+};
+const SUB_GROUP_LABELS = { 'villa': 'Villa' };
+function subGroupKey(s) { const nk = normSub(s); return SUB_GROUP_OVERRIDES[nk] || nk; }
+
+function normCategoria(raw) {
+  const c = (raw||'').toLowerCase().replace(/[^a-z]/g,'');
+  if (c.includes('icono')) return 'Iconos';
+  if (c.includes('ultra') || c.includes('utra')) return 'Ultra Premium';
+  if (c.includes('super')) return 'Super Premium';
+  if (c === 'premium') return 'Premium';
+  return 'Otros';
+}
+
+function renderWineryGrid() {
+  const grid = document.getElementById('wineryGrid');
+  grid.innerHTML = WINERIES.map(w => `
+      <button type="button" class="winery-btn" data-winery="${w.key}" aria-pressed="false" title="${w.key}" aria-label="${w.key}" onclick="selectWinery('${w.key.replace(/'/g,"\\'")}')">
+        <img src="${w.logo}" alt="${w.key}">
+      </button>`).join('');
+}
+
+function selectWinery(key) {
+  currentWinery = key;
+  currentSubmarcaKey = null;
+  currentSubmarcaLabel = null;
+  currentCategoriaKey = null;
+
+  document.querySelectorAll('.winery-btn').forEach(btn => {
+    btn.setAttribute('aria-pressed', btn.dataset.winery === key ? 'true' : 'false');
+  });
+
+  const records = AWARDS_DATA.filter(r => r.vina === key);
+
+  const submarcaStep = document.getElementById('submarcaStep');
+  const submarcaGrid = document.getElementById('submarcaGrid');
+
+  const uniqueSub = new Set(records.map(r => subGroupKey(r.submarca)));
+  if (uniqueSub.size <= 1) {
+    // Single submarca (e.g. Seña / Viñedo Chadwick): auto-select and skip step 2 UI
+    submarcaStep.classList.add('hidden');
+    if (uniqueSub.size === 1) {
+      const only = [...uniqueSub][0];
+      const label = SUB_GROUP_LABELS[only] || records.find(r => subGroupKey(r.submarca) === only).submarca;
+      selectSubmarca(only, label, key, null);
+    }
+    return;
+  }
+
+  // El agrupado por categoría (Iconos / Ultra Premium / Super Premium / Premium / Otros)
+  // aplica solo a Errázuriz, que es la única viña con ese nivel de detalle en su Excel.
+  const useCategoryGrouping = (key === 'Errázuriz');
+
+  submarcaStep.classList.remove('hidden');
+
+  if (!useCategoryGrouping) {
+    // Listado plano ordenado por frecuencia (como antes) para Arboleda, Caliterra, etc.
+    const groups = {};
+    records.forEach(r => {
+      const nk = subGroupKey(r.submarca);
+      if (!groups[nk]) groups[nk] = { label: r.submarca, count: 0, labelCounts: {} };
+      groups[nk].count++;
+      groups[nk].labelCounts[r.submarca] = (groups[nk].labelCounts[r.submarca]||0) + 1;
+    });
+    Object.entries(groups).forEach(([nk, g]) => {
+      g.label = SUB_GROUP_LABELS[nk] || Object.entries(g.labelCounts).sort((a,b)=>b[1]-a[1])[0][0];
+    });
+    const subKeys = Object.keys(groups).sort((a,b) => groups[b].count - groups[a].count);
+    const chips = subKeys.map(nk => `
+      <button type="button" class="submarca-chip" data-sub="${nk.replace(/"/g,'&quot;')}" aria-pressed="false" onclick="selectSubmarcaFromClick(this)">
+        ${groups[nk].label}<span class="chip-count">${groups[nk].count}</span>
+      </button>`).join('');
+    submarcaGrid.innerHTML = `<div class="submarca-grid">${chips}</div>`;
+  } else {
+    // catGroups[categoriaCanonica][submarcaKey] = { label, count }
+    const catGroups = {};
+    records.forEach(r => {
+      const catKey = normCategoria(r.categoria);
+      const subKey = subGroupKey(r.submarca);
+      if (!catGroups[catKey]) catGroups[catKey] = {};
+      if (!catGroups[catKey][subKey]) catGroups[catKey][subKey] = { label: r.submarca, count: 0, labelCounts: {} };
+      catGroups[catKey][subKey].count++;
+      catGroups[catKey][subKey].labelCounts[r.submarca] = (catGroups[catKey][subKey].labelCounts[r.submarca]||0) + 1;
+    });
+
+    const catKeysPresent = CATEGORY_ORDER.filter(c => catGroups[c]);
+
+    submarcaGrid.innerHTML = catKeysPresent.map(catKey => {
+      const subs = catGroups[catKey];
+      const subKeys = Object.keys(subs).sort((a,b) => subs[b].count - subs[a].count);
+      const chips = subKeys.map(nk => {
+        const label = SUB_GROUP_LABELS[nk] || Object.entries(subs[nk].labelCounts).sort((a,b)=>b[1]-a[1])[0][0];
+        return `<button type="button" class="submarca-chip" data-sub="${nk.replace(/"/g,'&quot;')}" data-cat="${catKey}" aria-pressed="false" onclick="selectSubmarcaFromClick(this)">
+          ${label}<span class="chip-count">${subs[nk].count}</span>
+        </button>`;
+      }).join('');
+      return `<div class="category-group">
+        <div class="category-heading">${catKey}</div>
+        <div class="submarca-grid">${chips}</div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('resultsStep').classList.add('hidden');
+}
+
+function selectSubmarcaFromClick(btn) {
+  const nk = btn.dataset.sub;
+  const catKey = btn.dataset.cat;
+  const label = btn.textContent.trim().replace(/\d+$/,'').trim();
+  document.querySelectorAll('.submarca-chip').forEach(c => c.setAttribute('aria-pressed', c === btn ? 'true' : 'false'));
+  selectSubmarca(nk, label, currentWinery, catKey);
+}
+
+function selectSubmarca(nk, label, winery, catKey) {
+  currentSubmarcaKey = nk;
+  currentSubmarcaLabel = label;
+  currentCategoriaKey = catKey || null;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('resultsStep').classList.remove('hidden');
+  const catSuffix = catKey ? ` (${catKey})` : '';
+  document.getElementById('resultsLabel').textContent = `3 · Resultados — ${winery} ${label}${catSuffix}`;
+  renderTable();
+  document.getElementById('resultsStep').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Sinónimos de cepa: la persona puede escribir el nombre completo de la variedad
+// y el buscador lo relaciona con el código abreviado que usa la planilla.
+const CEPA_SYNONYMS = {
+  'sb':    ['sauvignon blanc'],
+  'ch':    ['chardonnay'],
+  'pn':    ['pinot noir'],
+  'sy':    ['syrah', 'shiraz'],
+  'cm':    ['carmenere'],
+  'cs':    ['cabernet sauvignon'],
+  'blend': ['blend', 'bl'],
+  'mb':    ['malbec'],
+  'ml':    ['merlot'],
+};
+
+function stripAccents(s) {
+  return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'');
+}
+
+function cepaMatches(cepaRaw, q) {
+  const code = stripAccents(cepaRaw).trim().toLowerCase();
+  if (!code) return false;
+  if (code.includes(q)) return true;
+  const synonyms = CEPA_SYNONYMS[code] || [];
+  return synonyms.some(s => stripAccents(s).includes(q));
+}
+
+function getCurrentRecords() {
+  if (!currentWinery || currentSubmarcaKey === null) return [];
+  return AWARDS_DATA.filter(r => {
+    if (r.vina !== currentWinery) return false;
+    if (subGroupKey(r.submarca) !== currentSubmarcaKey) return false;
+    if (currentCategoriaKey && normCategoria(r.categoria) !== currentCategoriaKey) return false;
+    return true;
+  });
+}
+
+function sortRecords(records) {
+  return records.slice().sort((a,b) => {
+    const ay = parseInt(a.anio) || 0, by = parseInt(b.anio) || 0;
+    if (by !== ay) return by - ay;
+    const ac = parseInt(a.cosecha) || 0, bc = parseInt(b.cosecha) || 0;
+    return bc - ac;
+  });
+}
+
+function renderTable() {
+  const allRecords = sortRecords(getCurrentRecords());
+  const showSubmarcaCol = !!SUB_GROUP_LABELS[currentSubmarcaKey];
+
+  const tbody = document.getElementById('resultsBody');
+  const empty = document.getElementById('emptyState');
+  const countEl = document.getElementById('resultsCount');
+  const headRow = document.getElementById('resultsHeadRow');
+
+  headRow.innerHTML = (showSubmarcaCol ? '<th>Submarca</th>' : '') +
+    '<th>Concurso</th><th>Cepas</th><th>Cosecha</th><th>Puntaje</th><th>Premios</th>';
+
+  const q = stripAccents(document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  let records = allRecords;
+  if (q) {
+    records = records.filter(r =>
+      stripAccents(r.concurso||'').toLowerCase().includes(q) ||
+      cepaMatches(r.cepa, q) ||
+      stripAccents(r.premio||'').toLowerCase().includes(q) ||
+      String(r.cosecha||'').toLowerCase().includes(q)
+    );
+  }
+
+  countEl.textContent = `${records.length} resultado${records.length===1?'':'s'}`;
+
+  if (!records.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = records.map(r => `
+    <tr>
+      ${showSubmarcaCol ? `<td>${escapeHtml(r.submarca)}</td>` : ''}
+      <td>${escapeHtml(r.concurso)}</td>
+      <td>${escapeHtml(r.cepa)}</td>
+      <td class="col-cosecha">${escapeHtml(String(r.cosecha))}</td>
+      <td class="col-puntaje">${escapeHtml(String(r.puntaje))}</td>
+      <td class="col-premio">${escapeHtml(r.premio)}</td>
+    </tr>`).join('');
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+renderWineryGrid();
+</script>
+
+<!-- Contador de visitas oculto -->
+<script data-goatcounter="https://vfch.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
