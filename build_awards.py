@@ -26,6 +26,11 @@ TEMPLATE_HTML = os.path.join(BASE_DIR, '_awards_template.html')
 OUTPUT_HTML = os.path.join(BASE_DIR, 'Awards.html')
 STATE_FILE = os.path.join(BASE_DIR, '_awards_build_state.json')
 LOG_FILE = os.path.join(BASE_DIR, 'awards_build.log')
+SALES_REPORT_FILE = os.path.join(BASE_DIR, 'Informe de ventas (Real+1).xlsx')
+
+WEEKDAYS_ES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+MONTHS_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio',
+             'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
 SOURCE_FILES = {
     'arboleda':  os.path.join(AWARDS_DIR, 'Awards ARBOLEDA.xlsx'),
@@ -200,8 +205,63 @@ def build(force=False):
     return True
 
 
+def format_spanish_date(dt):
+    weekday = WEEKDAYS_ES[dt.weekday()]
+    month = MONTHS_ES[dt.month - 1].capitalize()
+    return f"{weekday} {dt.day} de {month} {dt.year}"
+
+
+def update_sales_report_label():
+    """Actualiza el texto "Actualizado por última vez el ..." del botón
+    INFORME DE VENTAS según la fecha real de modificación del Excel.
+    El link del botón NO se toca (queda fijo, ya que Cinthia sobrescribe
+    siempre el mismo archivo, así que el link para compartir de OneDrive
+    no cambia)."""
+    if not os.path.exists(SALES_REPORT_FILE):
+        log('ADVERTENCIA: no se encontró "Informe de ventas (Real+1).xlsx" para actualizar la fecha.')
+        return
+
+    mtime = os.path.getmtime(SALES_REPORT_FILE)
+    dt = datetime.fromtimestamp(mtime)
+    new_label = f"Actualizado por última vez el {format_spanish_date(dt)}"
+
+    try:
+        with io.open(INDEX_HTML, encoding='utf-8') as f:
+            content = f.read()
+    except PermissionError:
+        log('ADVERTENCIA: index.html está abierto/bloqueado, se reintentará en la próxima corrida.')
+        return
+
+    pattern = re.compile(r'(<span class="tool-btn-sub">)Actualizado por última vez el [^<]*(</span>)')
+    match = pattern.search(content)
+    if not match:
+        log('ADVERTENCIA: no se encontró el texto "Actualizado por última vez" en index.html.')
+        return
+
+    if new_label in match.group(0):
+        log('Informe de Ventas: fecha sin cambios, no se toca index.html.')
+        return
+
+    new_content = pattern.sub(lambda m: m.group(1) + new_label + m.group(2), content, count=1)
+
+    try:
+        tmp_path = INDEX_HTML + '.tmp'
+        with io.open(tmp_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        os.replace(tmp_path, INDEX_HTML)
+    except PermissionError:
+        log('ADVERTENCIA: no se pudo escribir index.html (bloqueado), se reintentará en la próxima corrida.')
+        return
+
+    log(f'index.html actualizado: "{new_label}"')
+
+
 if __name__ == '__main__':
     force = '--force' in sys.argv
+    try:
+        update_sales_report_label()
+    except Exception:
+        log('ERROR actualizando fecha del Informe de Ventas:\n' + traceback.format_exc())
     try:
         build(force=force)
     except Exception:
