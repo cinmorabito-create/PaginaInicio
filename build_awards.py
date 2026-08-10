@@ -15,6 +15,7 @@ import io
 import json
 import os
 import re
+import subprocess
 import sys
 import traceback
 from datetime import datetime
@@ -254,16 +255,59 @@ def update_sales_report_label():
         return
 
     log(f'index.html actualizado: "{new_label}"')
+    return True
+
+
+def git_commit_and_push(message):
+    """Sube a GitHub los archivos que build_awards.py haya modificado
+    (index.html y/o Awards.html), para que Vercel los despliegue solo.
+    Si no hay nada para subir, o git falla (sin conexión, conflicto, etc.),
+    queda registrado en el log y no interrumpe el resto del script."""
+    def run(*args):
+        return subprocess.run(
+            ['git', *args], cwd=BASE_DIR, capture_output=True, text=True
+        )
+
+    try:
+        run('add', 'index.html', 'Awards.html')
+
+        status = run('status', '--porcelain', 'index.html', 'Awards.html')
+        if not status.stdout.strip():
+            log('Git: nada que subir (sin cambios en index.html/Awards.html).')
+            return
+
+        commit = run('commit', '-m', message)
+        if commit.returncode != 0:
+            log('ADVERTENCIA: git commit falló:\n' + commit.stdout + commit.stderr)
+            return
+
+        push = run('push', 'origin', 'HEAD')
+        if push.returncode != 0:
+            log('ADVERTENCIA: git push falló (revisar conexión/credenciales):\n'
+                + push.stdout + push.stderr)
+            return
+
+        log('Git: cambios subidos a GitHub correctamente (Vercel debería redesplegar).')
+    except Exception:
+        log('ERROR haciendo git commit/push:\n' + traceback.format_exc())
 
 
 if __name__ == '__main__':
     force = '--force' in sys.argv
+    changed = False
+
     try:
-        update_sales_report_label()
+        if update_sales_report_label():
+            changed = True
     except Exception:
         log('ERROR actualizando fecha del Informe de Ventas:\n' + traceback.format_exc())
+
     try:
-        build(force=force)
+        if build(force=force):
+            changed = True
     except Exception:
         log('ERROR inesperado:\n' + traceback.format_exc())
         sys.exit(1)
+
+    if changed:
+        git_commit_and_push('Actualización automática (Informe de Ventas / Awards)')
