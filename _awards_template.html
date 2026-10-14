@@ -458,12 +458,14 @@ function getCurrentRecords() {
   });
 }
 
+// Orden: cosecha de mayor a menor (las sin cosecha, ej. "N/V" o "—", al final);
+// a igual cosecha, año del premio de mayor a menor.
 function sortRecords(records) {
   return records.slice().sort((a,b) => {
-    const ay = parseInt(a.anio) || 0, by = parseInt(b.anio) || 0;
-    if (by !== ay) return by - ay;
     const ac = parseInt(a.cosecha) || 0, bc = parseInt(b.cosecha) || 0;
-    return bc - ac;
+    if (bc !== ac) return bc - ac;
+    const ay = parseInt(a.anio) || 0, by = parseInt(b.anio) || 0;
+    return by - ay;
   });
 }
 
