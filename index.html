@@ -205,6 +205,7 @@
   }
   .tool-btn:hover::before { transform: scaleX(1); }
   .tool-btn:hover { color: var(--cream); border-color: var(--wine); }
+  .tool-btn[hidden] { display: none; }
   .tool-btn-content {
     position: relative;
     z-index: 1;
@@ -321,7 +322,8 @@
       </div>
       <div class="tools-grid">
 
-        <a class="tool-btn" href="https://vinaerrazuriz-my.sharepoint.com/:x:/g/personal/cmorabito_chadwickwines_cl/IQBk4rdOSmJaTYMDd7VxneiuAX5lCjxiR1HtWMTgrlCH0Jc?e=KyIMeI" target="_blank">
+        <!-- Informe de Ventas: oculto (quitar "hidden" para volver a mostrarlo) -->
+        <a class="tool-btn" href="https://vinaerrazuriz-my.sharepoint.com/:x:/g/personal/cmorabito_chadwickwines_cl/IQBk4rdOSmJaTYMDd7VxneiuAX5lCjxiR1HtWMTgrlCH0Jc?e=KyIMeI" target="_blank" hidden>
           <div class="tool-btn-content">
             <span class="tool-btn-name">Informe de Ventas</span>
             <span class="tool-btn-sub">Actualizado por última vez el Lunes 5 de Octubre 2026</span>
